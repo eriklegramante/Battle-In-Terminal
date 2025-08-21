@@ -1,4 +1,5 @@
 from random import randint
+from colorama import Fore, Style
 
 class character:
     def __init__(self, name, life, attack, special_attack, defense, stamina= 0):
@@ -19,7 +20,10 @@ class character:
                 if self.stamina > 100:
                     self.stamina = 100
         enemy.life -= damage
-        print(f"{self.name} attacks {enemy.name} for {damage} damage! (stamina: {self.stamina})")
+        if damage == 0:
+            print(f"{self.name} attacks {enemy.name} but it was ineffective {Fore.RED} Miss!")
+        else:
+            print(f"{self.name} attacks {enemy.name} for {damage} damage! (stamina: {self.stamina})")
 
     
     def special_attack_enemy(self, enemy): #attack when stamina reaches 100 (+25 per attack)
