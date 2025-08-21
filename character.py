@@ -14,7 +14,7 @@ class character:
         if damage < 1:
             damage = 0
         else:
-            if damage >= 5:
+            if damage >= 10:
                 self.stamina += 25
                 if self.stamina > 100:
                     self.stamina = 100
