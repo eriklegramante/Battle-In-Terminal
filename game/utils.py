@@ -1,5 +1,6 @@
 from colorama import Fore, Style
 
+
 def divider():
     print("=" * 30)
 
