@@ -1,4 +1,4 @@
-from utils import show_status, divider
+from utils import show_status, show_status_manual, divider
 import time
 from colorama import Fore, Style
 from cards import Cards
@@ -34,56 +34,57 @@ class Battle:
 
 
     def manual_battle(player1, player2):
-        while True:
-            player1.name = input("Please enter with your nickname player 1: ")
-            player2.name = input("Please enter with your nickname player 2: ")
-        
-            drawn_player = random.choice([player1, player2])
-            print(Fore.GREEN + f"{drawn_player.name} was drawn! ")
+        # Nomes dos jogadores
+        player1.name = input("Please enter with your nickname player 1: ")
+        player2.name = input("Please enter with your nickname player 2: ")
 
-            turn = 1
-            while player1.life > 0 and player2.life > 0:
-                show_status(player1, player2, turn)
-                
-                if drawn_player == player1:
-                    atk = input(f"1. Normal attack \n2. Use Cards \n> ")
+        # Sorteia quem começa
+        current_player = random.choice([player1, player2])
+        opponent = player2 if current_player == player1 else player1
+        print(Fore.GREEN + f"{current_player.name} was drawn to start!" + Style.RESET_ALL)
 
-                    if atk not in ['1', '2']:
-                        print(Fore.RED + "[INFO] Invalid option. Please choose 1 or 2.")
-                        continue
+        turn = 1
+        while player1.life > 0 and player2.life > 0:
+            divider()
+            print(Fore.CYAN + Style.BRIGHT + f"TURN {turn} - Your turn: {current_player.name}" + Style.RESET_ALL)
 
-                    if atk == '1':
-                        player1.attack_enemy(player2)
+            # --- Jogada do jogador atual ---
+            atk = input("1. Normal attack \n2. Use Cards \n> ")
 
-                    elif atk == '2':
-                        if player1.stamina >= 25:
-                            print("Your available cards:")
-                            deck = Cards.get_cards()
-                            hand = random.sample(deck, 3)
+            if atk == '1':
+                current_player.attack_enemy(opponent)
 
-                            for i, card in enumerate(hand, 1):
-                                print(f"{i}. {card}")
+            elif atk == '2':
+                if current_player.stamina >= 50:
+                    print("Your available cards:")
+                    deck = Cards.get_cards()
+                    hand = random.sample(deck, 3)
 
-                            choice = input("Choose a card (1-3): ")
-                            if choice in ['1', '2', '3']:
-                                chosen_card = hand[int(choice)-1]
-                                print(Fore.CYAN + f"{player1.name} used {chosen_card.name}!")
+                    for i, card in enumerate(hand, 1):
+                        print(f"{i}. {card}")
 
-                                # Aqui aplicamos os efeitos da carta (simplificado)
-                                if chosen_card.attack:
-                                    player2.life -= chosen_card.attack
-                                if chosen_card.defense:
-                                    player1.defense += chosen_card.defense
-                                if chosen_card.life:
-                                    player1.life += chosen_card.life
-                                if chosen_card.stamina:
-                                    player1.stamina += chosen_card.stamina
-                                if chosen_card.poison:
-                                    player2.life -= chosen_card.poison
-                                
-                                player1.stamina -= 25  # gastar stamina para usar carta
-                            else:
-                                print(Fore.RED + "Invalid card choice!")
+                    choice = input("Choose a card (1-3): ")
+                    if choice in ['1', '2', '3']:
+                        chosen_card = hand[int(choice)-1]
+                        print(Fore.CYAN + f"{current_player.name} used {chosen_card.name}!" + Style.RESET_ALL)
+                        chosen_card.apply(current_player, opponent)
+                        current_player.stamina -= 50
+                    else:
+                        print(Fore.RED + "Invalid card choice! You lost your turn." + Style.RESET_ALL)
+                else:
+                    print(Fore.RED + f"You can't use a card, not enough stamina ({current_player.stamina}/50)" + Style.RESET_ALL)
 
-                        else:
-                            print(Fore.RED + f"You can't use a Card, not enough stamina: {player1.stamina}")
+            else:
+                print(Fore.RED + "Invalid option! You lost your turn." + Style.RESET_ALL)
+
+            # --- Mostrar status depois da ação ---
+            show_status_manual(player1, player2, turn)
+
+            # Verifica vitória
+            if opponent.life <= 0:
+                print(Fore.GREEN + f"{opponent.name} has been defeated! {current_player.name} wins!" + Style.RESET_ALL)
+                break
+
+            # Troca jogadores (sempre acontece no fim do turno)
+            current_player, opponent = opponent, current_player
+            turn += 1

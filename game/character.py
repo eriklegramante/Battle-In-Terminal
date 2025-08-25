@@ -26,7 +26,7 @@ class Character:
             print(f"{self.name} attacks {enemy.name} for {damage} damage! (stamina: {self.stamina})")
 
     
-    def special_attack_enemy(self, enemy): #attack when stamina reaches 100 (+25 per attack)
+    def special_attack_enemy(self, enemy): #attack when stamina reaches 100 (+25 per attack), Special attack is only use in Automatic Battle
         if self.stamina >= 100:
             base = randint(20, 40) + self.special_attack
             damage = base - randint(5, enemy.defense)
